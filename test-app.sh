@@ -1,30 +1,29 @@
 #!/bin/bash
 
-# Test script for Mood Color Journal React App
 echo "🧪 Testing Mood Color Journal React Application"
 echo "=============================================="
 
-# Check if Node.js is installed
+# Check node
 if ! command -v node &> /dev/null; then
     echo "❌ Node.js is not installed. Please install Node.js first."
     exit 1
 fi
 
-# Check Node.js version
+# Check version
 NODE_VERSION=$(node --version)
 echo "✅ Node.js version: $NODE_VERSION"
 
-# Check if npm is installed
+# Check npm
 if ! command -v npm &> /dev/null; then
     echo "❌ npm is not installed. Please install npm first."
     exit 1
 fi
 
-# Check npm version
+# Check version
 NPM_VERSION=$(npm --version)
 echo "✅ npm version: $NPM_VERSION"
 
-# Install dependencies if node_modules doesn't exist
+# dependencies
 if [ ! -d "node_modules" ]; then
     echo "📦 Installing dependencies..."
     npm install
@@ -38,7 +37,7 @@ else
     echo "✅ Dependencies already installed"
 fi
 
-# Check if required files exist
+# file check
 echo "🔍 Checking required files..."
 
 REQUIRED_FILES=(
@@ -66,11 +65,11 @@ for file in "${REQUIRED_FILES[@]}"; do
     fi
 done
 
-# Check package.json version
+# package.json
 PACKAGE_VERSION=$(grep '"version"' package.json | cut -d'"' -f4)
 echo "✅ Package version: $PACKAGE_VERSION"
 
-# Check if Parse configuration is set up
+# Check Parse
 if grep -q "YOUR_APPLICATION_ID" src/services/parseConfig.js; then
     echo "⚠️  Parse configuration needs to be updated with your Back4App credentials"
     echo "   Please update src/services/parseConfig.js with your Application ID and JavaScript Key"
@@ -78,7 +77,7 @@ else
     echo "✅ Parse configuration appears to be set up"
 fi
 
-# Test webpack build
+# build
 echo "🔨 Testing webpack build..."
 npm run build
 if [ $? -eq 0 ]; then
@@ -88,7 +87,7 @@ else
     exit 1
 fi
 
-# Check if dist folder was created
+# dist folder
 if [ -d "dist" ]; then
     echo "✅ Production build created in dist folder"
 else
