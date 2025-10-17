@@ -2,15 +2,15 @@ import Parse from 'parse';
 
 // Parse configuration for Back4App
 const PARSE_CONFIG = {
-  APPLICATION_ID: 'YOUR_APPLICATION_ID', // Caz this is where you put in 
-  JAVASCRIPT_KEY: 'YOUR_JAVASCRIPT_KEY', // Caz - Replace with your Back4App JavaScript Key
+  APPLICATION_ID: 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD',  
+  JAVASCRIPT_KEY: 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ', 
   SERVER_URL: 'https://parseapi.back4app.com/', // Back4App server URL
 };
 
 //Parse is properly configured
 const isParseConfigured = () => {
-  return PARSE_CONFIG.APPLICATION_ID !== 'YOUR_APPLICATION_ID' &&  //Caz - replace 
-         PARSE_CONFIG.JAVASCRIPT_KEY !== 'YOUR_JAVASCRIPT_KEY';    //Caz replace
+  return PARSE_CONFIG.APPLICATION_ID !== 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD' &&  
+         PARSE_CONFIG.JAVASCRIPT_KEY !== 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ';    
 };
 
 //initialize parse 
