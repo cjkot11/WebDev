@@ -2,15 +2,15 @@ import Parse from 'parse';
 import LocalStorageService from '../services/localStorageService';
 
 /**
- * MoodColors Parse Model
- * Stores color mappings for different moods
+ Mood Colors Parse Model
+ stores color mappings for different moods
  */
 class MoodColors extends Parse.Object {
   constructor() {
     super('MoodColors');
   }
 
-  // Check if Parse is available
+  //check if the parse is available 
   static isParseAvailable() {
     try {
       return Parse.applicationId && Parse.applicationId !== 'YOUR_APPLICATION_ID';
@@ -19,23 +19,20 @@ class MoodColors extends Parse.Object {
     }
   }
 
-  // Static methods for querying (following rubric - queries outside components)
+  //static methods for querying
 
-  /**
-   * Get all mood colors
-   * @returns {Promise<Object>} Mood colors object
-   */
+  //get all the colors and returns a promise 
   static async getAllColors() {
     if (this.isParseAvailable()) {
       const query = new Parse.Query(MoodColors);
       const colors = await query.find();
       
       if (colors.length === 0) {
-        // Return default colors if none exist
+        //returns default 
         return MoodColors.getDefaultColors();
       }
 
-      // Convert Parse objects to plain object
+      //convert Parse objects to plain object
       const colorsData = {};
       colors.forEach(color => {
         const mood = color.get('mood');
@@ -48,17 +45,14 @@ class MoodColors extends Parse.Object {
 
       return colorsData;
     } else {
-      // Fallback to localStorage
+      //fallback is local -> pretty sure this is the way 
       const localStorageService = new LocalStorageService();
       return await localStorageService.getAllColors();
     }
   }
 
-  /**
-   * Get color by mood
-   * @param {string} mood - Mood type
-   * @returns {Promise<Object>} Color object for the mood
-   */
+
+  //get the color by the mood type
   static async getByMood(mood) {
     const query = new Parse.Query(MoodColors);
     query.equalTo('mood', mood);
@@ -75,10 +69,8 @@ class MoodColors extends Parse.Object {
     return null;
   }
 
-  /**
-   * Get default mood colors (fallback)
-   * @returns {Object} Default colors object
-   */
+
+  //default mood colrs 
   static getDefaultColors() {
     return {
       ecstatic: { color: "#FF69B4", name: "Hot Pink", description: "A vibrant, energetic color that reflects your amazing high spirits!" },
@@ -91,10 +83,7 @@ class MoodColors extends Parse.Object {
     };
   }
 
-  /**
-   * Initialize default mood colors in Parse
-   * @returns {Promise<boolean>} Success status
-   */
+//initialize defualt in parse 
   static async initializeDefaultColors() {
     try {
       const defaultColors = MoodColors.getDefaultColors();
@@ -120,12 +109,8 @@ class MoodColors extends Parse.Object {
   }
 
   /**
-   * Add new mood color
-   * @param {string} mood - Mood type
-   * @param {string} color - Hex color code
-   * @param {string} name - Color name
-   * @param {string} description - Color description
-   * @returns {Promise<MoodColors>} Created color
+   Add a new mood color
+   need the mood color name and description
    */
   static async addColor(mood, color, name, description = '') {
     const moodColor = new MoodColors();
@@ -137,12 +122,7 @@ class MoodColors extends Parse.Object {
     return await moodColor.save();
   }
 
-  /**
-   * Update mood color
-   * @param {string} id - Parse object ID
-   * @param {Object} updateData - Data to update
-   * @returns {Promise<MoodColors>} Updated color
-   */
+  //update mood color
   static async updateColor(id, updateData) {
     const color = await MoodColors.getById(id);
     
@@ -153,32 +133,20 @@ class MoodColors extends Parse.Object {
     return await color.save();
   }
 
-  /**
-   * Delete mood color
-   * @param {string} id - Parse object ID
-   * @returns {Promise<boolean>} Success status
-   */
+  //delete 
   static async deleteColor(id) {
     const color = await MoodColors.getById(id);
     await color.destroy();
     return true;
   }
 
-  /**
-   * Get color by ID
-   * @param {string} id - Parse object ID
-   * @returns {Promise<MoodColors>} Color object
-   */
+  //get the color by the id 
   static async getById(id) {
     const query = new Parse.Query(MoodColors);
     return await query.get(id);
   }
 
-  /**
-   * Generate mood color based on mood type
-   * @param {string} mood - Mood type
-   * @returns {Promise<Object>} Generated color object
-   */
+  //generates a color based on the mood
   static async generateMoodColor(mood) {
     if (this.isParseAvailable()) {
       const colorData = await MoodColors.getByMood(mood);
@@ -187,18 +155,17 @@ class MoodColors extends Parse.Object {
         return colorData;
       }
       
-      // Fallback to default color
+      //fallback to default color
       const defaultColors = MoodColors.getDefaultColors();
       return defaultColors[mood] || { color: "#808080", name: "Unknown", description: "A unique color that represents your current emotional state." };
     } else {
-      // Fallback to localStorage
       const localStorageService = new LocalStorageService();
       return await localStorageService.generateMoodColor(mood);
     }
   }
 }
 
-// Register the subclass
+//register 
 Parse.Object.registerSubclass('MoodColors', MoodColors);
 
 export default MoodColors;

@@ -3,6 +3,7 @@ import MoodEntry from '../models/MoodEntry';
 import MoodOptions from '../models/MoodOptions';
 import './History.css';
 
+//the mood history page 
 const History = () => {
   const [moodEntries, setMoodEntries] = useState([]);
   const [filteredEntries, setFilteredEntries] = useState([]);
@@ -14,7 +15,7 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Helper function to get value from entry (handles both Parse objects and plain objects)
+  //helper function to get value from entry (handles both Parse objects and plain objects)
   const getEntryValue = (entry, key) => {
     return entry.get ? entry.get(key) : entry[key];
   };
@@ -26,16 +27,16 @@ const History = () => {
   useEffect(() => {
     applyFilters();
   }, [moodEntries, filters]);
-
+  
+  //loading the data in 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Simulate async operation
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      // Load data from Parse Models (queries outside components)
+      //load data from the parse models 
       const [entries, options] = await Promise.all([
         MoodEntry.getAllEntries(),
         MoodOptions.getAllOptions(),
@@ -43,7 +44,7 @@ const History = () => {
 
       setMoodEntries(entries);
       setMoodOptions(options);
-
+      //for our errors
       console.log('History data loaded:', {
         entries: entries.length,
         options: Object.keys(options),
@@ -56,17 +57,18 @@ const History = () => {
     }
   };
 
+  //filters that the user can apply
   const applyFilters = () => {
     let filtered = [...moodEntries];
 
-    // Apply mood filter
+    //mood filter
     if (filters.mood) {
       filtered = filtered.filter(
         (entry) => getEntryValue(entry, 'overallMood') === filters.mood
       );
     }
 
-    // Apply date range filter
+    //date range 
     if (filters.dateRange !== 'all') {
       const now = new Date();
       let cutoffDate;
@@ -90,6 +92,7 @@ const History = () => {
       }
     }
 
+    //to tell the user 
     setFilteredEntries(filtered);
     console.log(
       `Filtered entries: ${filtered.length} of ${moodEntries.length}`
@@ -100,6 +103,7 @@ const History = () => {
     setFilters({ ...filters, [filterType]: value });
   };
 
+  //clear 
   const clearFilters = () => {
     setFilters({
       mood: '',
@@ -107,6 +111,7 @@ const History = () => {
     });
   };
 
+  //for each entry 
   const createEntryCard = (entry) => {
     const date = new Date(getEntryValue(entry, 'date'));
     const formattedDate = date.toLocaleDateString('en-US', {
@@ -120,6 +125,7 @@ const History = () => {
     const gratitude = getEntryValue(entry, 'gratitude') || '';
     const highlight = getEntryValue(entry, 'highlight') || '';
 
+    //html
     return (
       <div key={entry.id || entry.objectId} className="entry-card">
         <div className="entry-header">

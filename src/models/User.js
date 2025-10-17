@@ -1,38 +1,27 @@
 import Parse from 'parse';
 
 /**
- * User Parse Model
- * Extends Parse.User to add custom user functionality
- * Establishes relationships with mood entries (Rule of 10)
+  User Parse Model
+  Extends Parse.User to add custom user functionality
  */
 class User extends Parse.User {
   constructor() {
     super();
   }
 
-  // Static methods for querying (following rubric - queries outside components)
 
-  /**
-   * Get current user
-   * @returns {Parse.User|null} Current user or null
-   */
+ //get the user 
   static getCurrentUser() {
     return Parse.User.current();
   }
 
-  /**
-   * Sign up a new user
-   * @param {string} username - Username
-   * @param {string} password - Password
-   * @param {Object} additionalData - Additional user data
-   * @returns {Promise<Parse.User>} Created user
-   */
+  //sign up a new user 
   static async signUp(username, password, additionalData = {}) {
     const user = new User();
     user.set('username', username);
     user.set('password', password);
     
-    // Set additional data
+    //set data 
     Object.keys(additionalData).forEach(key => {
       user.set(key, additionalData[key]);
     });
@@ -40,34 +29,22 @@ class User extends Parse.User {
     return await user.signUp();
   }
 
-  /**
-   * Log in user
-   * @param {string} username - Username
-   * @param {string} password - Password
-   * @returns {Promise<Parse.User>} Logged in user
-   */
+  //login
   static async logIn(username, password) {
     return await Parse.User.logIn(username, password);
   }
 
-  /**
-   * Log out current user
-   * @returns {Promise<void>}
-   */
+  //logout
   static async logOut() {
     return await Parse.User.logOut();
   }
 
-  /**
-   * Get user's mood entries (relationship query)
-   * @param {string} userId - User ID (optional, defaults to current user)
-   * @returns {Promise<Array>} Array of user's mood entries
-   */
+  //get user's mood entry - the relationship 
   static async getUserMoodEntries(userId = null) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('User not found'); //error 
     }
 
     const query = new Parse.Query('MoodEntry');
@@ -76,11 +53,7 @@ class User extends Parse.User {
     return await query.find();
   }
 
-  /**
-   * Get user's recent mood entries (last 7 days)
-   * @param {string} userId - User ID (optional, defaults to current user)
-   * @returns {Promise<Array>} Array of recent mood entries
-   */
+  //the recent mood entries - 7 days 
   static async getUserRecentEntries(userId = null) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     
@@ -98,16 +71,12 @@ class User extends Parse.User {
     return await query.find();
   }
 
-  /**
-   * Get user's mood statistics
-   * @param {string} userId - User ID (optional, defaults to current user)
-   * @returns {Promise<Object>} User's mood statistics
-   */
+  //user's mood stats - might make less repetitive in future features 
   static async getUserStatistics(userId = null) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('User not found'); //error
     }
 
     const query = new Parse.Query('MoodEntry');
@@ -124,18 +93,18 @@ class User extends Parse.User {
       };
     }
 
-    // Calculate statistics
+    //calculate stats 
     const totalStress = entries.reduce((sum, entry) => sum + entry.get('stressLevel'), 0);
     const averageStressLevel = Math.round(totalStress / entries.length);
 
-    // Calculate mood distribution
+    //mood distribution
     const moodDistribution = {};
     entries.forEach((entry) => {
       const mood = entry.get('overallMood');
       moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
     });
 
-    // Find most common mood
+    //most common 
     const mostCommonMood = Object.keys(moodDistribution).reduce((a, b) =>
       moodDistribution[a] > moodDistribution[b] ? a : b
     );
@@ -149,22 +118,13 @@ class User extends Parse.User {
     };
   }
 
-  /**
-   * Get user by ID
-   * @param {string} id - User ID
-   * @returns {Promise<Parse.User>} User object
-   */
+  //user by id
   static async getById(id) {
     const query = new Parse.Query(Parse.User);
     return await query.get(id);
   }
 
-  /**
-   * Update user profile
-   * @param {string} userId - User ID (optional, defaults to current user)
-   * @param {Object} updateData - Data to update
-   * @returns {Promise<Parse.User>} Updated user
-   */
+  //update the user profile 
   static async updateProfile(userId = null, updateData) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     
@@ -179,24 +139,17 @@ class User extends Parse.User {
     return await user.save();
   }
 
-  /**
-   * Check if user is authenticated
-   * @returns {boolean} Authentication status
-   */
+  //authentification - dont know if we want to use 
   static isAuthenticated() {
     return Parse.User.current() !== null;
   }
 
-  /**
-   * Get user's display name
-   * @param {string} userId - User ID (optional, defaults to current user)
-   * @returns {string} Display name
-   */
+  //get the user's name 
   static async getDisplayName(userId = null) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     
     if (!user) {
-      return 'Guest';
+      return 'Guest'; //default 
     }
 
     return user.get('displayName') || user.get('username') || 'User';
@@ -204,10 +157,7 @@ class User extends Parse.User {
 
   // Instance methods
 
-  /**
-   * Get user's mood entries count
-   * @returns {Promise<number>} Number of mood entries
-   */
+  //entry counts 
   async getMoodEntriesCount() {
     const query = new Parse.Query('MoodEntry');
     query.equalTo('user', this);
@@ -215,10 +165,7 @@ class User extends Parse.User {
     return count;
   }
 
-  /**
-   * Get user's last mood entry
-   * @returns {Promise<Parse.Object|null>} Last mood entry or null
-   */
+  //last entry 
   async getLastMoodEntry() {
     const query = new Parse.Query('MoodEntry');
     query.equalTo('user', this);
@@ -228,7 +175,7 @@ class User extends Parse.User {
   }
 }
 
-// Register the subclass
+//register 
 Parse.Object.registerSubclass('_User', User);
 
 export default User;

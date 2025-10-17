@@ -1,4 +1,4 @@
-// localStorage fallback service for when Parse is not configured
+// localStorage fallback service for when Parse is not configured - got some help creating during our problem solving process 
 class LocalStorageService {
   constructor() {
     this.storageKey = 'moodJournal_data';
@@ -132,13 +132,13 @@ class LocalStorageService {
     };
   }
 
-  // MoodOptions methods
+  // Mood Options methods
   async getAllOptions() {
     const data = this.getData();
     return data.moodOptions || {};
   }
 
-  // MoodColors methods
+  // Mood Colors methods
   async getAllColors() {
     const data = this.getData();
     return data.moodColors || {};

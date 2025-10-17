@@ -2,15 +2,15 @@ import Parse from 'parse';
 import LocalStorageService from '../services/localStorageService';
 
 /**
- * MoodOptions Parse Model
- * Stores configuration data for mood tracking options
+  Mood Options Parse Model
+  Stores configuration data for mood tracking options
  */
 class MoodOptions extends Parse.Object {
   constructor() {
     super('MoodOptions');
   }
 
-  // Check if Parse is available
+  //check availability 
   static isParseAvailable() {
     try {
       return Parse.applicationId && Parse.applicationId !== 'YOUR_APPLICATION_ID';
@@ -19,23 +19,19 @@ class MoodOptions extends Parse.Object {
     }
   }
 
-  // Static methods for querying (following rubric - queries outside components)
 
-  /**
-   * Get all mood options
-   * @returns {Promise<Object>} Mood options object
-   */
+  //get the mood options 
   static async getAllOptions() {
     if (this.isParseAvailable()) {
       const query = new Parse.Query(MoodOptions);
       const options = await query.find();
       
       if (options.length === 0) {
-        // Return default options if none exist
+        //default 
         return MoodOptions.getDefaultOptions();
       }
 
-      // Convert Parse objects to plain object
+      //convert Parse objects to plain object
       const optionsData = {};
       options.forEach(option => {
         const category = option.get('category');
@@ -51,17 +47,13 @@ class MoodOptions extends Parse.Object {
 
       return optionsData;
     } else {
-      // Fallback to localStorage
+      //fallback 
       const localStorageService = new LocalStorageService();
       return await localStorageService.getAllOptions();
     }
   }
 
-  /**
-   * Get options by category
-   * @param {string} category - Category name (e.g., 'overallMood', 'energyLevel')
-   * @returns {Promise<Array>} Array of options for the category
-   */
+  //get options by category
   static async getByCategory(category) {
     const query = new Parse.Query(MoodOptions);
     query.equalTo('category', category);
@@ -74,10 +66,7 @@ class MoodOptions extends Parse.Object {
     }));
   }
 
-  /**
-   * Get default mood options (fallback)
-   * @returns {Object} Default options object
-   */
+  //fallback 
   static getDefaultOptions() {
     return {
       overallMood: [
@@ -114,10 +103,7 @@ class MoodOptions extends Parse.Object {
     };
   }
 
-  /**
-   * Initialize default mood options in Parse
-   * @returns {Promise<boolean>} Success status
-   */
+  //initialize in parse 
   static async initializeDefaultOptions() {
     try {
       const defaultOptions = MoodOptions.getDefaultOptions();
@@ -143,20 +129,14 @@ class MoodOptions extends Parse.Object {
     }
   }
 
-  /**
-   * Add new option to a category
-   * @param {string} category - Category name
-   * @param {string} value - Option value
-   * @param {string} label - Option label
-   * @returns {Promise<MoodOptions>} Created option
-   */
+  //add a new option 
   static async addOption(category, value, label) {
     const moodOption = new MoodOptions();
     moodOption.set('category', category);
     moodOption.set('value', value);
     moodOption.set('label', label);
     
-    // Get the next order number
+    //next order number 
     const query = new Parse.Query(MoodOptions);
     query.equalTo('category', category);
     query.descending('order');
@@ -168,12 +148,7 @@ class MoodOptions extends Parse.Object {
     return await moodOption.save();
   }
 
-  /**
-   * Update option
-   * @param {string} id - Parse object ID
-   * @param {Object} updateData - Data to update
-   * @returns {Promise<MoodOptions>} Updated option
-   */
+  //update the option 
   static async updateOption(id, updateData) {
     const option = await MoodOptions.getById(id);
     
@@ -184,29 +159,21 @@ class MoodOptions extends Parse.Object {
     return await option.save();
   }
 
-  /**
-   * Delete option
-   * @param {string} id - Parse object ID
-   * @returns {Promise<boolean>} Success status
-   */
+  //delete the option 
   static async deleteOption(id) {
     const option = await MoodOptions.getById(id);
     await option.destroy();
     return true;
   }
 
-  /**
-   * Get option by ID
-   * @param {string} id - Parse object ID
-   * @returns {Promise<MoodOptions>} Option object
-   */
+  //by id 
   static async getById(id) {
     const query = new Parse.Query(MoodOptions);
     return await query.get(id);
   }
 }
 
-// Register the subclass
+
 Parse.Object.registerSubclass('MoodOptions', MoodOptions);
 
 export default MoodOptions;

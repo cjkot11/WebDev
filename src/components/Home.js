@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import MoodEntry from '../models/MoodEntry';
 import './Home.css';
 
+//home page 
 const Home = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,15 +13,15 @@ const Home = () => {
     loadStatistics();
   }, []);
 
+  //loading in the data 
   const loadStatistics = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Simulate async operation for demonstration
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Get statistics from Parse Model (queries outside components)
+      //stats from the parse model 
       const statistics = await MoodEntry.getStatistics();
       setStats(statistics);
 
@@ -54,6 +55,7 @@ const Home = () => {
     );
   }
 
+  //html
   return (
     <div className="home-container">
       <div className="header-section">

@@ -2,15 +2,15 @@ import Parse from 'parse';
 import LocalStorageService from '../services/localStorageService';
 
 /**
- * MoodEntry Parse Model
- * Represents a single mood entry with all associated data
+ Mood Entry Parse Model
+ *Represents a single mood entry with all associated data
  */
 class MoodEntry extends Parse.Object {
   constructor() {
     super('MoodEntry');
   }
 
-  // Check if Parse is available
+  //check is available
   static isParseAvailable() {
     try {
       return Parse.applicationId && Parse.applicationId !== 'YOUR_APPLICATION_ID';
@@ -19,12 +19,8 @@ class MoodEntry extends Parse.Object {
     }
   }
 
-  // Static methods for querying (following rubric - queries outside components)
   
-  /**
-   * Get all mood entries
-   * @returns {Promise<Array>} Array of mood entries
-   */
+  //get all entries 
   static async getAllEntries() {
     if (this.isParseAvailable()) {
       const query = new Parse.Query(MoodEntry);
@@ -37,20 +33,13 @@ class MoodEntry extends Parse.Object {
     }
   }
 
-  /**
-   * Get mood entry by ID
-   * @param {string} id - Parse object ID
-   * @returns {Promise<MoodEntry>} Mood entry object
-   */
+  //get mood entry by the id 
   static async getById(id) {
     const query = new Parse.Query(MoodEntry);
     return await query.get(id);
   }
 
-  /**
-   * Get recent mood entries (last 7 days)
-   * @returns {Promise<Array>} Array of recent mood entries
-   */
+  //get the recent entries - 7 days 
   static async getRecentEntries() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -61,11 +50,7 @@ class MoodEntry extends Parse.Object {
     return await query.find();
   }
 
-  /**
-   * Get mood entries by mood type
-   * @param {string} mood - Mood type to filter by
-   * @returns {Promise<Array>} Array of mood entries
-   */
+  //entries by mood 
   static async getByMood(mood) {
     const query = new Parse.Query(MoodEntry);
     query.equalTo('overallMood', mood);
@@ -73,12 +58,7 @@ class MoodEntry extends Parse.Object {
     return await query.find();
   }
 
-  /**
-   * Get mood entries by date range
-   * @param {Date} startDate - Start date
-   * @param {Date} endDate - End date
-   * @returns {Promise<Array>} Array of mood entries
-   */
+  //entries by the date 
   static async getByDateRange(startDate, endDate) {
     const query = new Parse.Query(MoodEntry);
     query.greaterThanOrEqualTo('date', startDate);
@@ -87,10 +67,7 @@ class MoodEntry extends Parse.Object {
     return await query.find();
   }
 
-  /**
-   * Get mood statistics
-   * @returns {Promise<Object>} Statistics object
-   */
+  //mood stats 
   static async getStatistics() {
     if (this.isParseAvailable()) {
       const query = new Parse.Query(MoodEntry);
@@ -106,18 +83,18 @@ class MoodEntry extends Parse.Object {
         };
       }
 
-      // Calculate statistics
+      //way to calculate the stats - might change later 
       const totalStress = entries.reduce((sum, entry) => sum + entry.get('stressLevel'), 0);
       const averageStressLevel = Math.round(totalStress / entries.length);
 
-      // Calculate mood distribution
+      //the distribution 
       const moodDistribution = {};
       entries.forEach((entry) => {
         const mood = entry.get('overallMood');
         moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
       });
 
-      // Find most common mood
+      // most common mood 
       const mostCommonMood = Object.keys(moodDistribution).reduce((a, b) =>
         moodDistribution[a] > moodDistribution[b] ? a : b
       );
@@ -127,10 +104,10 @@ class MoodEntry extends Parse.Object {
         averageStressLevel,
         mostCommonMood,
         moodDistribution,
-        recentTrend: 'stable', // Could be enhanced with trend analysis
+        recentTrend: 'stable', // might add a trend analysis later 
       };
     } else {
-      // Fallback to localStorage
+      // fallback
       const localStorageService = new LocalStorageService();
       return await localStorageService.getStatistics();
     }
@@ -138,23 +115,18 @@ class MoodEntry extends Parse.Object {
 
   // Instance methods
 
-  /**
-   * Create a new mood entry
-   * @param {Object} moodData - Mood entry data
-   * @param {Parse.User} user - User creating the entry (optional, defaults to current user)
-   * @returns {Promise<MoodEntry>} Created mood entry
-   */
+  //create a new mood entry
   static async createEntry(moodData, user = null) {
     if (this.isParseAvailable()) {
       const moodEntry = new MoodEntry();
       
-      // Set user relationship (Rule of 10)
+      //set user relationship (Rule of 10)
       const currentUser = user || Parse.User.current();
       if (currentUser) {
         moodEntry.set('user', currentUser);
       }
       
-      // Set all the mood data
+      //set all the mood data
       moodEntry.set('overallMood', moodData.overallMood);
       moodEntry.set('energyLevel', moodData.energyLevel);
       moodEntry.set('socialInteractions', moodData.socialInteractions || []);
@@ -170,18 +142,12 @@ class MoodEntry extends Parse.Object {
 
       return await moodEntry.save();
     } else {
-      // Fallback to localStorage
       const localStorageService = new LocalStorageService();
       return await localStorageService.createEntry(moodData);
     }
   }
 
-  /**
-   * Update mood entry
-   * @param {string} id - Parse object ID
-   * @param {Object} updateData - Data to update
-   * @returns {Promise<MoodEntry>} Updated mood entry
-   */
+  //update mood entry 
   static async updateEntry(id, updateData) {
     const moodEntry = await MoodEntry.getById(id);
     
@@ -192,11 +158,7 @@ class MoodEntry extends Parse.Object {
     return await moodEntry.save();
   }
 
-  /**
-   * Delete mood entry
-   * @param {string} id - Parse object ID
-   * @returns {Promise<boolean>} Success status
-   */
+  //delete 
   static async deleteEntry(id) {
     const moodEntry = await MoodEntry.getById(id);
     await moodEntry.destroy();
@@ -204,7 +166,7 @@ class MoodEntry extends Parse.Object {
   }
 }
 
-// Register the subclass
+//register 
 Parse.Object.registerSubclass('MoodEntry', MoodEntry);
 
 export default MoodEntry;

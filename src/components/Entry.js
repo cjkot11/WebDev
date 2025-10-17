@@ -5,6 +5,7 @@ import MoodOptions from '../models/MoodOptions';
 import MoodColors from '../models/MoodColors';
 import './Entry.css';
 
+//making the entry
 const Entry = () => {
   const [formData, setFormData] = useState({
     overallMood: '',
@@ -28,7 +29,7 @@ const Entry = () => {
 
   const loadMoodOptions = async () => {
     try {
-      // Load mood options from Parse Model (queries outside components)
+      // load mood options from Parse Model -> queries outside components 
       const options = await MoodOptions.getAllOptions();
       setMoodOptions(options);
       console.log('Mood options loaded:', options);
@@ -38,6 +39,7 @@ const Entry = () => {
     }
   };
 
+  //handles the user input on the entry
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -57,8 +59,10 @@ const Entry = () => {
     }
   };
 
+  //entry validation once the user wants to submit
   const validateForm = () => {
     const errors = [];
+    //errors for each of the required inputs
 
     if (!formData.overallMood) {
       errors.push('Please select your overall mood');
@@ -79,12 +83,13 @@ const Entry = () => {
     return errors;
   };
 
+  //generating the entry
   const generateMoodEntry = async (formData) => {
     try {
-      // Simulate async processing
+      // simulate async processing
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Get mood color from Parse Model (queries outside components)
+      // get moood color from the parse model
       const colorData = await MoodColors.generateMoodColor(formData.overallMood);
 
       const moodEntry = {
@@ -101,6 +106,7 @@ const Entry = () => {
     }
   };
 
+  //the user submitting
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -108,13 +114,13 @@ const Entry = () => {
       setLoading(true);
       setError(null);
 
-      // Validate form
+      // validate form
       const errors = validateForm();
       if (errors.length > 0) {
         throw new Error(errors.join(', '));
       }
 
-      // Generate mood entry
+      //generate
       const moodEntry = await generateMoodEntry(formData);
       setCurrentMoodEntry(moodEntry);
 
@@ -127,6 +133,7 @@ const Entry = () => {
     }
   };
 
+  //saving the entry
   const saveMoodEntry = async () => {
     try {
       if (!currentMoodEntry) {
@@ -136,16 +143,16 @@ const Entry = () => {
       setLoading(true);
       setError(null);
 
-      // Simulate async save operation
+      //using the promise
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Save entry using Parse Model (queries outside components)
+      //using parse model to save 
       const savedEntry = await MoodEntry.createEntry(currentMoodEntry);
 
       console.log('Mood entry saved:', savedEntry);
       setSuccess('Mood entry saved successfully!');
 
-      // Reset form
+      //reset 
       setFormData({
         overallMood: '',
         energyLevel: '',
@@ -165,6 +172,7 @@ const Entry = () => {
     }
   };
 
+  //resetting the form
   const resetForm = () => {
     setFormData({
       overallMood: '',
@@ -181,6 +189,7 @@ const Entry = () => {
     setSuccess(null);
   };
 
+  //load spinner
   if (loading) {
     return (
       <div className="loading-container">
@@ -189,7 +198,7 @@ const Entry = () => {
       </div>
     );
   }
-
+//html
   return (
     <div className="entry-container">
       <div className="header-section">

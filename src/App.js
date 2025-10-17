@@ -6,6 +6,7 @@ import Entry from './components/Entry';
 import History from './components/History';
 import './App.css';
 
+//overall app 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
@@ -15,7 +16,7 @@ function App() {
       try {
         console.log('Initializing Mood Journal App...');
         
-        // Initialize Parse (will fallback to localStorage if not configured)
+        //initialize parse 
         const parseInitialized = initializeParse();
         
         if (parseInitialized) {
@@ -35,6 +36,7 @@ function App() {
     initApp();
   }, []);
 
+  //error 
   if (error) {
     return (
       <div className="error-container">
@@ -47,6 +49,7 @@ function App() {
     );
   }
 
+  //loader 
   if (!isInitialized) {
     return (
       <div className="loading-container">
@@ -56,6 +59,7 @@ function App() {
     );
   }
 
+  //html 
   return (
     <Router>
       <div className="app">
