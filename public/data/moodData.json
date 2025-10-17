@@ -1,0 +1,116 @@
+{
+  "moodEntries": [
+    {
+      "id": 1,
+      "date": "2024-01-15",
+      "overallMood": "happy",
+      "energyLevel": "high",
+      "socialInteractions": ["family", "friends"],
+      "stressLevel": 3,
+      "primaryThoughts": "work",
+      "gratitude": "Grateful for the sunny weather and good health",
+      "highlight": "Had a great lunch with my best friend",
+      "intention": "Focus on completing the project proposal",
+      "moodColor": "#FFD700",
+      "colorName": "Golden Yellow"
+    },
+    {
+      "id": 2,
+      "date": "2024-01-14",
+      "overallMood": "content",
+      "energyLevel": "medium",
+      "socialInteractions": ["colleagues"],
+      "stressLevel": 5,
+      "primaryThoughts": "health",
+      "gratitude": "Thankful for a peaceful evening at home",
+      "highlight": "Finished reading a good book",
+      "intention": "Start the new workout routine",
+      "moodColor": "#87CEEB",
+      "colorName": "Sky Blue"
+    },
+    {
+      "id": 3,
+      "date": "2024-01-13",
+      "overallMood": "anxious",
+      "energyLevel": "low",
+      "socialInteractions": ["none"],
+      "stressLevel": 8,
+      "primaryThoughts": "future",
+      "gratitude": "Grateful for supportive family members",
+      "highlight": "Received encouraging words from a mentor",
+      "intention": "Take time to relax and recharge",
+      "moodColor": "#DDA0DD",
+      "colorName": "Plum"
+    },
+    {
+      "id": 4,
+      "date": "2024-01-12",
+      "overallMood": "ecstatic",
+      "energyLevel": "high",
+      "socialInteractions": ["family", "friends", "colleagues"],
+      "stressLevel": 2,
+      "primaryThoughts": "creative",
+      "gratitude": "So grateful for the amazing opportunities coming my way",
+      "highlight": "Got promoted at work!",
+      "intention": "Celebrate this achievement with loved ones",
+      "moodColor": "#FF69B4",
+      "colorName": "Hot Pink"
+    },
+    {
+      "id": 5,
+      "date": "2024-01-11",
+      "overallMood": "neutral",
+      "energyLevel": "medium",
+      "socialInteractions": ["strangers"],
+      "stressLevel": 4,
+      "primaryThoughts": "learning",
+      "gratitude": "Grateful for the ability to learn new things",
+      "highlight": "Attended an interesting workshop",
+      "intention": "Apply what I learned today",
+      "moodColor": "#98FB98",
+      "colorName": "Pale Green"
+    }
+  ],
+  "moodOptions": {
+    "overallMood": [
+      { "value": "ecstatic", "label": "Ecstatic - On top of the world!" },
+      { "value": "happy", "label": "Happy - Feeling great" },
+      { "value": "content", "label": "Content - Satisfied and calm" },
+      { "value": "neutral", "label": "Neutral - Neither good nor bad" },
+      { "value": "anxious", "label": "Anxious - Worried or stressed" },
+      { "value": "sad", "label": "Sad - Feeling down" },
+      { "value": "frustrated", "label": "Frustrated - Annoyed or agitated" }
+    ],
+    "energyLevel": [
+      { "value": "high", "label": "High" },
+      { "value": "medium", "label": "Medium" },
+      { "value": "low", "label": "Low" }
+    ],
+    "socialInteractions": [
+      { "value": "family", "label": "Family" },
+      { "value": "friends", "label": "Friends" },
+      { "value": "colleagues", "label": "Colleagues" },
+      { "value": "strangers", "label": "Strangers" },
+      { "value": "none", "label": "Mostly alone" }
+    ],
+    "primaryThoughts": [
+      { "value": "work", "label": "Work/Career" },
+      { "value": "relationships", "label": "Relationships" },
+      { "value": "health", "label": "Health/Wellness" },
+      { "value": "future", "label": "Future plans" },
+      { "value": "past", "label": "Past memories" },
+      { "value": "creative", "label": "Creative projects" },
+      { "value": "learning", "label": "Learning/Growth" },
+      { "value": "relaxation", "label": "Rest and relaxation" }
+    ]
+  },
+  "moodColors": {
+    "ecstatic": { "color": "#FF69B4", "name": "Hot Pink" },
+    "happy": { "color": "#FFD700", "name": "Golden Yellow" },
+    "content": { "color": "#87CEEB", "name": "Sky Blue" },
+    "neutral": { "color": "#98FB98", "name": "Pale Green" },
+    "anxious": { "color": "#DDA0DD", "name": "Plum" },
+    "sad": { "color": "#4169E1", "name": "Royal Blue" },
+    "frustrated": { "color": "#FF6347", "name": "Tomato" }
+  }
+}
