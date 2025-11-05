@@ -10,12 +10,20 @@ const Auth = () => {
   const [form, setForm] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
   // Redirect away if already authenticated
   useEffect(() => {
-    if (authService.isAuthenticated()) {
-      navigate('/', { replace: true });
+    try {
+      const isAuth = authService.isAuthenticated();
+      if (isAuth) {
+        navigate('/', { replace: true });
+      }
+    } catch (err) {
+      console.error('Error checking authentication:', err);
     }
+    // Always show the form (even if checking auth fails)
+    setIsReady(true);
   }, [navigate]);
 
   const handleChange = (e) => {
@@ -44,8 +52,18 @@ const Auth = () => {
     }
   };
 
+  if (!isReady) {
+    return (
+      <div className="entry-container" style={{ maxWidth: 420 }}>
+        <div className="header-section">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="entry-container" style={{ maxWidth: 420 }}>
+    <div className="entry-container" style={{ maxWidth: 420, margin: '0 auto' }}>
       <div className="header-section">
         <h1>{mode === 'login' ? 'Log in' : 'Sign up'}</h1>
         <p>{mode === 'login' ? 'Welcome back' : 'Create your account'}</p>

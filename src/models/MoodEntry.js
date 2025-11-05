@@ -23,9 +23,19 @@ class MoodEntry extends Parse.Object {
   //get all entries 
   static async getAllEntries() {
     if (this.isParseAvailable()) {
-      const query = new Parse.Query(MoodEntry);
-      query.descending('createdAt');
-      return await query.find();
+      try {
+        const query = new Parse.Query(MoodEntry);
+        query.descending('createdAt');
+        return await query.find();
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        // Only log as warning if it's not a 403/401 (which we expect might happen)
+        if (error.code !== 209 && error.code !== 101 && !error.message?.includes('403') && !error.message?.includes('unauthorized')) {
+          console.warn('Parse error in getAllEntries, falling back to localStorage:', error.message || error);
+        }
+        const localStorageService = new LocalStorageService();
+        return await localStorageService.getAllEntries();
+      }
     } else {
       // Fallback to localStorage
       const localStorageService = new LocalStorageService();
@@ -70,42 +80,52 @@ class MoodEntry extends Parse.Object {
   //mood stats 
   static async getStatistics() {
     if (this.isParseAvailable()) {
-      const query = new Parse.Query(MoodEntry);
-      const entries = await query.find();
-      
-      if (entries.length === 0) {
+      try {
+        const query = new Parse.Query(MoodEntry);
+        const entries = await query.find();
+        
+        if (entries.length === 0) {
+          return {
+            totalEntries: 0,
+            averageStressLevel: 0,
+            mostCommonMood: null,
+            moodDistribution: {},
+            recentTrend: 'stable',
+          };
+        }
+
+        //way to calculate the stats - might change later 
+        const totalStress = entries.reduce((sum, entry) => sum + entry.get('stressLevel'), 0);
+        const averageStressLevel = Math.round(totalStress / entries.length);
+
+        //the distribution 
+        const moodDistribution = {};
+        entries.forEach((entry) => {
+          const mood = entry.get('overallMood');
+          moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
+        });
+
+        // most common mood 
+        const mostCommonMood = Object.keys(moodDistribution).reduce((a, b) =>
+          moodDistribution[a] > moodDistribution[b] ? a : b
+        );
+
         return {
-          totalEntries: 0,
-          averageStressLevel: 0,
-          mostCommonMood: null,
-          moodDistribution: {},
-          recentTrend: 'stable',
+          totalEntries: entries.length,
+          averageStressLevel,
+          mostCommonMood,
+          moodDistribution,
+          recentTrend: 'stable', // might add a trend analysis later 
         };
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        // Only log as warning if it's not a 403/401 (which we expect might happen)
+        if (error.code !== 209 && error.code !== 101 && !error.message?.includes('403') && !error.message?.includes('unauthorized')) {
+          console.warn('Parse error in getStatistics, falling back to localStorage:', error.message);
+        }
+        const localStorageService = new LocalStorageService();
+        return await localStorageService.getStatistics();
       }
-
-      //way to calculate the stats - might change later 
-      const totalStress = entries.reduce((sum, entry) => sum + entry.get('stressLevel'), 0);
-      const averageStressLevel = Math.round(totalStress / entries.length);
-
-      //the distribution 
-      const moodDistribution = {};
-      entries.forEach((entry) => {
-        const mood = entry.get('overallMood');
-        moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
-      });
-
-      // most common mood 
-      const mostCommonMood = Object.keys(moodDistribution).reduce((a, b) =>
-        moodDistribution[a] > moodDistribution[b] ? a : b
-      );
-
-      return {
-        totalEntries: entries.length,
-        averageStressLevel,
-        mostCommonMood,
-        moodDistribution,
-        recentTrend: 'stable', // might add a trend analysis later 
-      };
     } else {
       // fallback
       const localStorageService = new LocalStorageService();
@@ -118,29 +138,40 @@ class MoodEntry extends Parse.Object {
   //create a new mood entry
   static async createEntry(moodData, user = null) {
     if (this.isParseAvailable()) {
-      const moodEntry = new MoodEntry();
-      
-      //set user relationship (Rule of 10)
-      const currentUser = user || Parse.User.current();
-      if (currentUser) {
-        moodEntry.set('user', currentUser);
-      }
-      
-      //set all the mood data
-      moodEntry.set('overallMood', moodData.overallMood);
-      moodEntry.set('energyLevel', moodData.energyLevel);
-      moodEntry.set('socialInteractions', moodData.socialInteractions || []);
-      moodEntry.set('stressLevel', moodData.stressLevel);
-      moodEntry.set('primaryThoughts', moodData.primaryThoughts);
-      moodEntry.set('gratitude', moodData.gratitude || '');
-      moodEntry.set('highlight', moodData.highlight || '');
-      moodEntry.set('intention', moodData.intention || '');
-      moodEntry.set('moodColor', moodData.moodColor);
-      moodEntry.set('colorName', moodData.colorName);
-      moodEntry.set('colorDescription', moodData.colorDescription || '');
-      moodEntry.set('date', new Date(moodData.date || Date.now()));
+      try {
+        const moodEntry = new MoodEntry();
+        
+        //set user relationship (Rule of 10)
+        const currentUser = user || Parse.User.current();
+        if (currentUser) {
+          moodEntry.set('user', currentUser);
+        }
+        
+        //set all the mood data
+        moodEntry.set('overallMood', moodData.overallMood);
+        moodEntry.set('energyLevel', moodData.energyLevel);
+        moodEntry.set('socialInteractions', moodData.socialInteractions || []);
+        moodEntry.set('stressLevel', moodData.stressLevel);
+        moodEntry.set('primaryThoughts', moodData.primaryThoughts);
+        moodEntry.set('gratitude', moodData.gratitude || '');
+        moodEntry.set('highlight', moodData.highlight || '');
+        moodEntry.set('intention', moodData.intention || '');
+        moodEntry.set('moodColor', moodData.moodColor);
+        moodEntry.set('colorName', moodData.colorName);
+        moodEntry.set('colorDescription', moodData.colorDescription || '');
+        moodEntry.set('date', new Date(moodData.date || Date.now()));
 
-      return await moodEntry.save();
+        const saved = await moodEntry.save();
+        console.log('✅ Successfully saved to Back4App:', saved.id);
+        return saved;
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        console.warn('⚠️ Parse save failed, using localStorage fallback:', error.message || error.code);
+        const localStorageService = new LocalStorageService();
+        const localEntry = await localStorageService.createEntry(moodData);
+        console.log('✅ Saved to localStorage instead');
+        return localEntry;
+      }
     } else {
       const localStorageService = new LocalStorageService();
       return await localStorageService.createEntry(moodData);
@@ -166,7 +197,12 @@ class MoodEntry extends Parse.Object {
   }
 }
 
-//register 
-Parse.Object.registerSubclass('MoodEntry', MoodEntry);
+//register - only if Parse is available
+try {
+  Parse.Object.registerSubclass('MoodEntry', MoodEntry);
+} catch (error) {
+  // Parse may not be initialized yet, which is fine - will use localStorage fallback
+  console.warn('Could not register MoodEntry subclass:', error.message);
+}
 
 export default MoodEntry;

@@ -24,26 +24,36 @@ class MoodColors extends Parse.Object {
   //get all the colors and returns a promise 
   static async getAllColors() {
     if (this.isParseAvailable()) {
-      const query = new Parse.Query(MoodColors);
-      const colors = await query.find();
-      
-      if (colors.length === 0) {
-        //returns default 
-        return MoodColors.getDefaultColors();
+      try {
+        const query = new Parse.Query(MoodColors);
+        const colors = await query.find();
+        
+        if (colors.length === 0) {
+          //returns default 
+          return MoodColors.getDefaultColors();
+        }
+
+        //convert Parse objects to plain object
+        const colorsData = {};
+        colors.forEach(color => {
+          const mood = color.get('mood');
+          colorsData[mood] = {
+            color: color.get('color'),
+            name: color.get('name'),
+            description: color.get('description') || ''
+          };
+        });
+
+        return colorsData;
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        // Only log as warning if it's not a 403/401 (which we expect might happen)
+        if (error.code !== 209 && error.code !== 101 && !error.message?.includes('403') && !error.message?.includes('unauthorized')) {
+          console.warn('Parse error in getAllColors, falling back to localStorage:', error.message);
+        }
+        const localStorageService = new LocalStorageService();
+        return await localStorageService.getAllColors();
       }
-
-      //convert Parse objects to plain object
-      const colorsData = {};
-      colors.forEach(color => {
-        const mood = color.get('mood');
-        colorsData[mood] = {
-          color: color.get('color'),
-          name: color.get('name'),
-          description: color.get('description') || ''
-        };
-      });
-
-      return colorsData;
     } else {
       //fallback is local -> pretty sure this is the way 
       const localStorageService = new LocalStorageService();
@@ -149,15 +159,25 @@ class MoodColors extends Parse.Object {
   //generates a color based on the mood
   static async generateMoodColor(mood) {
     if (this.isParseAvailable()) {
-      const colorData = await MoodColors.getByMood(mood);
-      
-      if (colorData) {
-        return colorData;
+      try {
+        const colorData = await MoodColors.getByMood(mood);
+        
+        if (colorData) {
+          return colorData;
+        }
+        
+        //fallback to default color
+        const defaultColors = MoodColors.getDefaultColors();
+        return defaultColors[mood] || { color: "#808080", name: "Unknown", description: "A unique color that represents your current emotional state." };
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        // Only log as warning if it's not a 403/401 (which we expect might happen)
+        if (error.code !== 209 && error.code !== 101 && !error.message?.includes('403') && !error.message?.includes('unauthorized')) {
+          console.warn('Parse error in generateMoodColor, falling back to localStorage:', error.message);
+        }
+        const localStorageService = new LocalStorageService();
+        return await localStorageService.generateMoodColor(mood);
       }
-      
-      //fallback to default color
-      const defaultColors = MoodColors.getDefaultColors();
-      return defaultColors[mood] || { color: "#808080", name: "Unknown", description: "A unique color that represents your current emotional state." };
     } else {
       const localStorageService = new LocalStorageService();
       return await localStorageService.generateMoodColor(mood);
@@ -165,7 +185,12 @@ class MoodColors extends Parse.Object {
   }
 }
 
-//register 
-Parse.Object.registerSubclass('MoodColors', MoodColors);
+//register - only if Parse is available
+try {
+  Parse.Object.registerSubclass('MoodColors', MoodColors);
+} catch (error) {
+  // Parse may not be initialized yet, which is fine - will use localStorage fallback
+  console.warn('Could not register MoodColors subclass:', error.message);
+}
 
 export default MoodColors;

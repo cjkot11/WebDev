@@ -175,7 +175,12 @@ class User extends Parse.User {
   }
 }
 
-//register 
-Parse.Object.registerSubclass('_User', User);
+//register - only if Parse is available
+try {
+  Parse.Object.registerSubclass('_User', User);
+} catch (error) {
+  // Parse may not be initialized yet, which is fine
+  console.warn('Could not register User subclass:', error.message);
+}
 
 export default User;

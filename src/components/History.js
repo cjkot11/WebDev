@@ -36,22 +36,25 @@ const History = () => {
 
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      //load data from the parse models 
+      //load data from the parse models (will fallback to localStorage on error)
       const [entries, options] = await Promise.all([
-        MoodEntry.getAllEntries(),
-        MoodOptions.getAllOptions(),
+        MoodEntry.getAllEntries().catch(() => []), // Fallback to empty array if error
+        MoodOptions.getAllOptions().catch(() => MoodOptions.getDefaultOptions()), // Fallback to defaults if error
       ]);
 
-      setMoodEntries(entries);
-      setMoodOptions(options);
+      setMoodEntries(entries || []);
+      setMoodOptions(options || MoodOptions.getDefaultOptions());
       //for our errors
       console.log('History data loaded:', {
-        entries: entries.length,
-        options: Object.keys(options),
+        entries: entries?.length || 0,
+        options: Object.keys(options || {}),
       });
     } catch (error) {
       console.error('Error loading history data:', error);
-      setError('Failed to load mood history');
+      // Even on error, initialize with empty/default values so page doesn't break
+      setMoodEntries([]);
+      setMoodOptions(MoodOptions.getDefaultOptions());
+      setError('Failed to load mood history - using default options');
     } finally {
       setLoading(false);
     }

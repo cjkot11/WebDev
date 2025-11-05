@@ -13,6 +13,8 @@ class MoodOptions extends Parse.Object {
   //check availability 
   static isParseAvailable() {
     try {
+      // Check if Parse is configured AND working (not just initialized)
+      // We'll rely on error handling to fall back if Parse isn't actually working
       return Parse.applicationId && Parse.applicationId !== 'YOUR_APPLICATION_ID';
     } catch {
       return false;
@@ -23,29 +25,39 @@ class MoodOptions extends Parse.Object {
   //get the mood options 
   static async getAllOptions() {
     if (this.isParseAvailable()) {
-      const query = new Parse.Query(MoodOptions);
-      const options = await query.find();
-      
-      if (options.length === 0) {
-        //default 
-        return MoodOptions.getDefaultOptions();
-      }
-
-      //convert Parse objects to plain object
-      const optionsData = {};
-      options.forEach(option => {
-        const category = option.get('category');
-        const value = option.get('value');
-        const label = option.get('label');
+      try {
+        const query = new Parse.Query(MoodOptions);
+        const options = await query.find();
         
-        if (!optionsData[category]) {
-          optionsData[category] = [];
+        if (options.length === 0) {
+          //default 
+          return MoodOptions.getDefaultOptions();
         }
-        
-        optionsData[category].push({ value, label });
-      });
 
-      return optionsData;
+        //convert Parse objects to plain object
+        const optionsData = {};
+        options.forEach(option => {
+          const category = option.get('category');
+          const value = option.get('value');
+          const label = option.get('label');
+          
+          if (!optionsData[category]) {
+            optionsData[category] = [];
+          }
+          
+          optionsData[category].push({ value, label });
+        });
+
+        return optionsData;
+      } catch (error) {
+        // If Parse returns 403/401 or any error, fall back to localStorage
+        // Only log as warning if it's not a 403/401 (which we expect might happen)
+        if (error.code !== 209 && error.code !== 101 && !error.message?.includes('403') && !error.message?.includes('unauthorized')) {
+          console.warn('Parse error in getAllOptions, falling back to localStorage:', error.message);
+        }
+        const localStorageService = new LocalStorageService();
+        return await localStorageService.getAllOptions();
+      }
     } else {
       //fallback 
       const localStorageService = new LocalStorageService();
@@ -174,6 +186,12 @@ class MoodOptions extends Parse.Object {
 }
 
 
-Parse.Object.registerSubclass('MoodOptions', MoodOptions);
+//register - only if Parse is available
+try {
+  Parse.Object.registerSubclass('MoodOptions', MoodOptions);
+} catch (error) {
+  // Parse may not be initialized yet, which is fine - will use localStorage fallback
+  console.warn('Could not register MoodOptions subclass:', error.message);
+}
 
 export default MoodOptions;
