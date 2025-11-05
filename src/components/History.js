@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MoodEntry from '../models/MoodEntry';
 import MoodOptions from '../models/MoodOptions';
 import './History.css';
@@ -14,15 +15,17 @@ const History = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const location = useLocation();
 
   //helper function to get value from entry (handles both Parse objects and plain objects)
   const getEntryValue = (entry, key) => {
     return entry.get ? entry.get(key) : entry[key];
   };
 
+  // Reload data when component mounts or when route changes (e.g., after saving an entry)
   useEffect(() => {
     loadData();
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     applyFilters();

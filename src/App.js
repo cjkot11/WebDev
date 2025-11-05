@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { initializeParse } from './services/parseConfig';
 import authService from './services/authService';
 import Home from './components/Home';
@@ -49,45 +49,18 @@ function App() {
     initApp();
   }, []);
 
-  // Handle logout
-  const handleLogout = async () => {
-    try {
-      await authService.logOut();
-      setCurrentUser(null);
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error logging out:', error);
-      setCurrentUser(null);
-    }
-  };
+  // Inner component that can use useLocation hook (must be inside Router)
+  const AppContent = () => {
+    const location = useLocation();
+    
+    // Update user state when route changes (e.g., after login)
+    useEffect(() => {
+      const user = authService.getCurrentUser();
+      setCurrentUser(user);
+    }, [location]);
 
-  //error 
-  if (error) {
     return (
-      <div className="error-container">
-        <div className="error-content">
-          <h2>Error</h2>
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
-        </div>
-      </div>
-    );
-  }
-
-  //loader 
-  if (!isInitialized) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  //html 
-  return (
-    <Router>
-      <div className="app">
+      <>
         {/* Navigation */}
         <nav className="nav-container">
           <div className="nav-content">
@@ -148,6 +121,50 @@ function App() {
             />
           </Routes>
         </main>
+      </>
+    );
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await authService.logOut();
+      setCurrentUser(null);
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error logging out:', error);
+      setCurrentUser(null);
+    }
+  };
+
+  //error 
+  if (error) {
+    return (
+      <div className="error-container">
+        <div className="error-content">
+          <h2>Error</h2>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  //loader 
+  if (!isInitialized) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  //html 
+  return (
+    <Router>
+      <div className="app">
+        <AppContent />
       </div>
     </Router>
   );

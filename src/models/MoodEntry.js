@@ -20,13 +20,27 @@ class MoodEntry extends Parse.Object {
   }
 
   
-  //get all entries 
-  static async getAllEntries() {
+  //get all entries for the current user
+  static async getAllEntries(user = null) {
+    const currentUser = user || Parse.User.current();
+    
     if (this.isParseAvailable()) {
       try {
         const query = new Parse.Query(MoodEntry);
+        
+        // Filter by current user if logged in (Rule of 10 - user relationship)
+        if (currentUser) {
+          query.equalTo('user', currentUser);
+          console.log('🔍 Querying entries for user:', currentUser.get('username') || currentUser.id);
+        } else {
+          console.warn('⚠️ No current user found - returning empty array');
+          return [];
+        }
+        
         query.descending('createdAt');
-        return await query.find();
+        const entries = await query.find();
+        console.log('✅ Found', entries.length, 'entries for current user');
+        return entries;
       } catch (error) {
         // If Parse returns 403/401 or any error, fall back to localStorage
         // Only log as warning if it's not a 403/401 (which we expect might happen)
@@ -77,11 +91,19 @@ class MoodEntry extends Parse.Object {
     return await query.find();
   }
 
-  //mood stats 
-  static async getStatistics() {
+  //mood stats for the current user
+  static async getStatistics(user = null) {
+    const currentUser = user || Parse.User.current();
+    
     if (this.isParseAvailable()) {
       try {
         const query = new Parse.Query(MoodEntry);
+        
+        // Filter by current user if logged in (Rule of 10 - user relationship)
+        if (currentUser) {
+          query.equalTo('user', currentUser);
+        }
+        
         const entries = await query.find();
         
         if (entries.length === 0) {
@@ -145,13 +167,20 @@ class MoodEntry extends Parse.Object {
         const currentUser = user || Parse.User.current();
         if (currentUser) {
           moodEntry.set('user', currentUser);
+          console.log('✅ Setting user relationship for entry:', currentUser.get('username') || currentUser.id);
+        } else {
+          console.warn('⚠️ No current user found when creating entry - entry will not be associated with a user');
         }
         
         //set all the mood data
         moodEntry.set('overallMood', moodData.overallMood);
         moodEntry.set('energyLevel', moodData.energyLevel);
         moodEntry.set('socialInteractions', moodData.socialInteractions || []);
-        moodEntry.set('stressLevel', moodData.stressLevel);
+        // Ensure stressLevel is a number (not a string)
+        const stressLevel = typeof moodData.stressLevel === 'string' 
+          ? parseInt(moodData.stressLevel, 10) 
+          : Number(moodData.stressLevel);
+        moodEntry.set('stressLevel', stressLevel);
         moodEntry.set('primaryThoughts', moodData.primaryThoughts);
         moodEntry.set('gratitude', moodData.gratitude || '');
         moodEntry.set('highlight', moodData.highlight || '');

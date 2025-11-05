@@ -54,6 +54,9 @@ const Entry = () => {
         }
       }
       setFormData({ ...formData, socialInteractions });
+    } else if (type === 'range') {
+      // Range inputs return strings, convert to number
+      setFormData({ ...formData, [name]: parseInt(value, 10) });
     } else {
       setFormData({ ...formData, [name]: value });
     }
