@@ -3,7 +3,7 @@ import Parse from 'parse';
 // Parse configuration for Back4App
 const PARSE_CONFIG = {
   APPLICATION_ID: 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD', // Replace with your Back4App Application ID
-  JAVASCRIPT_KEY: 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ', // Replace with your Back4App JavaScript Key
+  JAVASCRIPT_KEY: 'clKiHVEVxM8aMHOd1IRkHk5kCWUkkVDL8xC8Jmdk', // Replace with your Back4App JavaScript Key
   SERVER_URL: 'https://parseapi.back4app.com/', // Back4App server URL
 };
 
