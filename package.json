@@ -1,6 +1,6 @@
 {
   "name": "mood-color-journal",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A React-based mood tracking application with Back4App integration",
   "main": "src/index.js",
   "scripts": {

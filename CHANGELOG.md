@@ -5,6 +5,23 @@ All notable changes to the Mood Color Journal project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-11-05
+
+### Added
+- Authentication flow with Parse (login/signup/logout)
+- `authService` encapsulating all authentication methods
+- `Auth` component with redirects and error handling
+- `ProtectedRoute` wrapper to guard `/entry` and `/history`
+- Redirect unauthenticated users to `/login` when accessing protected routes
+- Prevent authenticated users from visiting `/login`
+
+### Changed
+- Navigation updated to show Login/Logout appropriately
+- Version bumped to 0.3.0
+
+### Quality
+- Ensured no console errors and clean builds
+
 ## [0.2.0] - 2024-01-20
 
 ### Added
@@ -47,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - **UML Diagram**: Complete class diagram showing React component architecture
 - **Component Tree**: Detailed component hierarchy and data flow
-- **API Documentation**: Comprehensive Parse Model method documentation
+- **Changelog**: Version history and changes
 - **Setup Instructions**: Updated for React and Back4App deployment
 
 ### Dependencies

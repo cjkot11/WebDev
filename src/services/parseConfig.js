@@ -2,18 +2,20 @@ import Parse from 'parse';
 
 // Parse configuration for Back4App
 const PARSE_CONFIG = {
-  APPLICATION_ID: 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD',  
-  JAVASCRIPT_KEY: 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ', 
+  APPLICATION_ID: 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD', // Replace with your Back4App Application ID
+  JAVASCRIPT_KEY: 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ', // Replace with your Back4App JavaScript Key
   SERVER_URL: 'https://parseapi.back4app.com/', // Back4App server URL
 };
 
-//Parse is properly configured
+// Check if Parse is properly configured
 const isParseConfigured = () => {
-  return PARSE_CONFIG.APPLICATION_ID !== 'mSp0fnMf7qX9Buh21cJQWa14588cqN5VUUBrbFiD' &&  
-         PARSE_CONFIG.JAVASCRIPT_KEY !== 'Nf7HDoBPoSqBQuIqNLhhHIQRJCXqepSVXvn3bKwQ';    
+  return PARSE_CONFIG.APPLICATION_ID !== 'YOUR_APPLICATION_ID' && 
+         PARSE_CONFIG.JAVASCRIPT_KEY !== 'YOUR_JAVASCRIPT_KEY';
 };
 
-//initialize parse 
+/**
+ * Initialize Parse with Back4App configuration
+ */
 export const initializeParse = () => {
   try {
     if (!isParseConfigured()) {
@@ -32,7 +34,10 @@ export const initializeParse = () => {
   }
 };
 
-
+/**
+ * Get Parse instance
+ * @returns {Parse} Parse instance
+ */
 export const getParse = () => {
   return Parse;
 };
