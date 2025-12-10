@@ -189,6 +189,9 @@ class MoodEntry extends Parse.Object {
         moodEntry.set('colorName', moodData.colorName);
         moodEntry.set('colorDescription', moodData.colorDescription || '');
         moodEntry.set('date', new Date(moodData.date || Date.now()));
+        // Story 6: Save tags (array, max 3) - ensure it's always an array
+        const tags = Array.isArray(moodData.tags) ? moodData.tags : (moodData.tags ? [moodData.tags] : []);
+        moodEntry.set('tags', tags);
 
         const saved = await moodEntry.save();
         console.log('✅ Successfully saved to Back4App:', saved.id);

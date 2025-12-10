@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 
+// from the class example
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const authed = authService.isAuthenticated();

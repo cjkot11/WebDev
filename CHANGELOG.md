@@ -5,7 +5,7 @@ All notable changes to the Mood Color Journal project will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2025-11-05
+## [0.3.0] - 2024-01-25
 
 ### Added
 - Authentication flow with Parse (login/signup/logout)
@@ -119,10 +119,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Future Roadmap
 
 ### Planned Features
-- **User Authentication**: Login/signup functionality
-- **Real-time Updates**: Live data synchronization
-- **Export Functionality**: Data export capabilities
-- **Advanced Analytics**: Detailed mood pattern analysis
+- **Real-time Updates**: Live data synchronization across multiple devices
+- **Export Functionality**: Data export capabilities (CSV, JSON)
+- **Advanced Analytics**: Detailed mood pattern analysis and insights
 - **Social Features**: Sharing and community features
 - **Mobile App**: React Native mobile application
-- **Offline Support**: Progressive Web App capabilities
+- **Offline Support**: Progressive Web App capabilities with service workers

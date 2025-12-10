@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import MoodEntry from '../models/MoodEntry';
 import MoodOptions from '../models/MoodOptions';
 import MoodColors from '../models/MoodColors';
+import { generateColorFromMoodData } from '../utils/colorDecisionLogic';
 import './Entry.css';
 
 //making the entry
@@ -16,7 +17,10 @@ const Entry = () => {
     gratitude: '',
     highlight: '',
     intention: '',
+    tags: [], // Story 6: Tags (max 3)
   });
+  const [tagInput, setTagInput] = useState('');
+  const [availableTags, setAvailableTags] = useState(['work', 'family', 'stress', 'exercise', 'social', 'creative', 'rest', 'travel', 'health', 'celebration']);
   const [moodOptions, setMoodOptions] = useState(null);
   const [currentMoodEntry, setCurrentMoodEntry] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -92,8 +96,24 @@ const Entry = () => {
       // simulate async processing
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // get moood color from the parse model
-      const colorData = await MoodColors.generateMoodColor(formData.overallMood);
+      // Use the decision-making function that considers multiple mood factors
+      // Extract scores and keywords from text fields if needed
+      const sentimentScores = extractSentimentScores(formData);
+      const keywords = extractKeywords(formData);
+
+      const moodData = {
+        overallMood: formData.overallMood,
+        energyLevel: formData.energyLevel,
+        stressLevel: formData.stressLevel,
+        socialInteractions: formData.socialInteractions,
+        primaryThoughts: formData.primaryThoughts,
+        sentimentScores: sentimentScores,
+        keywords: keywords,
+        tags: formData.tags || []
+      };
+
+      // Get color using decision logic function (feature 6)
+      const colorData = await generateColorFromMoodData(moodData);
 
       const moodEntry = {
         ...formData,
@@ -107,6 +127,58 @@ const Entry = () => {
       console.error('Error generating mood entry:', error);
       throw error;
     }
+  };
+
+  // Extract scores from text fields (simple keyword-based analysis)
+  const extractSentimentScores = (formData) => {
+    const positiveWords = ['grateful', 'happy', 'great', 'wonderful', 'amazing', 'excited', 'love', 'joy', 'celebration', 'success', 'achievement'];
+    const negativeWords = ['worried', 'anxious', 'stress', 'sad', 'frustrated', 'tired', 'lonely', 'concerned', 'difficult', 'challenge'];
+    
+    const text = `${formData.gratitude || ''} ${formData.highlight || ''} ${formData.intention || ''}`.toLowerCase();
+    
+    let positiveCount = 0;
+    let negativeCount = 0;
+    
+    positiveWords.forEach(word => {
+      if (text.includes(word)) positiveCount++;
+    });
+    
+    negativeWords.forEach(word => {
+      if (text.includes(word)) negativeCount++;
+    });
+    
+    const totalWords = positiveCount + negativeCount;
+    if (totalWords === 0) {
+      return { positive: 0.5, negative: 0.3, neutral: 0.2 };
+    }
+    
+    return {
+      positive: positiveCount / totalWords,
+      negative: negativeCount / totalWords,
+      neutral: 1 - (positiveCount / totalWords) - (negativeCount / totalWords)
+    };
+  };
+
+  // Extract keywords from text fields
+  const extractKeywords = (formData) => {
+    const keywords = [];
+    const text = `${formData.gratitude || ''} ${formData.highlight || ''} ${formData.intention || ''}`.toLowerCase();
+    
+    // Common mood-related keywords
+    const moodKeywords = ['work', 'family', 'friends', 'health', 'exercise', 'creative', 'relaxation', 'learning', 'celebration', 'stress', 'peaceful', 'energetic'];
+    
+    moodKeywords.forEach(keyword => {
+      if (text.includes(keyword)) {
+        keywords.push(keyword);
+      }
+    });
+    
+    // Add tags as keywords
+    if (formData.tags && Array.isArray(formData.tags)) {
+      keywords.push(...formData.tags);
+    }
+    
+    return [...new Set(keywords)]; // Remove duplicates
   };
 
   //the user submitting
@@ -165,7 +237,9 @@ const Entry = () => {
         gratitude: '',
         highlight: '',
         intention: '',
+        tags: [], // Story 6: Reset tags
       });
+      setTagInput('');
       setCurrentMoodEntry(null);
     } catch (error) {
       console.error('Error saving mood entry:', error);
@@ -175,7 +249,39 @@ const Entry = () => {
     }
   };
 
-  //resetting the form
+  // Story 6: Tag handlers
+  const handleAddTag = (tag) => {
+    const currentTags = formData.tags || [];
+    if (currentTags.length >= 3) {
+      setError('Maximum 3 tags allowed');
+      return;
+    }
+    const normalizedTag = tag.toLowerCase().trim();
+    if (normalizedTag && !currentTags.includes(normalizedTag)) {
+      setFormData({ ...formData, tags: [...currentTags, normalizedTag] });
+      setTagInput('');
+      setError(null);
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    const currentTags = formData.tags || [];
+    setFormData({
+      ...formData,
+      tags: currentTags.filter(tag => tag !== tagToRemove)
+    });
+  };
+
+  const handleTagInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (tagInput.trim()) {
+        handleAddTag(tagInput);
+      }
+    }
+  };
+
+  //resetting the form - outside the other function (a little repetitive but it is a work around)
   const resetForm = () => {
     setFormData({
       overallMood: '',
@@ -186,7 +292,9 @@ const Entry = () => {
       gratitude: '',
       highlight: '',
       intention: '',
+      tags: [],
     });
+    setTagInput('');
     setCurrentMoodEntry(null);
     setError(null);
     setSuccess(null);
@@ -360,6 +468,98 @@ const Entry = () => {
             placeholder="Set an intention for tomorrow..."
             rows="3"
           />
+        </div>
+
+        {/* Story 6: Tags */}
+        <div className="form-group">
+          <label htmlFor="tags">Tags (optional, max 3)</label>
+          <div className="tag-input-container">
+            <input
+              type="text"
+              id="tag-input"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagInputKeyDown}
+              placeholder={(formData.tags || []).length >= 3 ? "Maximum 3 tags reached" : "Type a tag and press Enter"}
+              disabled={(formData.tags || []).length >= 3}
+              style={{ width: '100%', padding: '0.8rem', border: '2px solid #e1e5e9', borderRadius: 8 }}
+            />
+            <button
+              type="button"
+              onClick={() => handleAddTag(tagInput)}
+              disabled={(formData.tags || []).length >= 3 || !tagInput.trim()}
+              className="add-tag-button"
+              style={{ marginTop: '0.5rem', padding: '0.5rem 1rem', background: '#667eea', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}
+            >
+              Add Tag
+            </button>
+          </div>
+          {(formData.tags || []).length > 0 && (
+            <div className="tags-display" style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {(formData.tags || []).map((tag, index) => (
+                <span
+                  key={index}
+                  className="tag-badge"
+                  style={{
+                    background: '#667eea',
+                    color: 'white',
+                    padding: '0.3rem 0.8rem',
+                    borderRadius: 15,
+                    fontSize: '0.9rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    style={{
+                      background: 'rgba(255,255,255,0.3)',
+                      border: 'none',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '18px',
+                      height: '18px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      lineHeight: '1'
+                    }}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="available-tags" style={{ marginTop: '0.5rem' }}>
+            <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.3rem' }}>Suggested tags:</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+              {availableTags
+                .filter(tag => !(formData.tags || []).includes(tag.toLowerCase()))
+                .slice(0, 8)
+                .map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleAddTag(tag)}
+                    disabled={(formData.tags || []).length >= 3}
+                    style={{
+                      padding: '0.2rem 0.6rem',
+                      background: '#f0f0f0',
+                      border: '1px solid #ddd',
+                      borderRadius: 12,
+                      fontSize: '0.8rem',
+                      cursor: (formData.tags || []).length >= 3 ? 'not-allowed' : 'pointer',
+                      opacity: (formData.tags || []).length >= 3 ? 0.5 : 1
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
+            </div>
+          </div>
         </div>
 
         <div className="form-actions">

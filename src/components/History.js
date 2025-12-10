@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import MoodEntry from '../models/MoodEntry';
 import MoodOptions from '../models/MoodOptions';
+import TrendGraph from './TrendGraph'; // Story 4: Trend Graph
 import './History.css';
 
 //the mood history page 
@@ -12,7 +13,9 @@ const History = () => {
   const [filters, setFilters] = useState({
     mood: '',
     dateRange: 'all',
+    tag: '', // Story 6: Tag filter
   });
+  const [availableTags, setAvailableTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
@@ -47,10 +50,22 @@ const History = () => {
 
       setMoodEntries(entries || []);
       setMoodOptions(options || MoodOptions.getDefaultOptions());
+      
+      // Story 6: Extract all unique tags from entries
+      const allTags = new Set();
+      (entries || []).forEach(entry => {
+        const tags = getEntryValue(entry, 'tags') || [];
+        if (Array.isArray(tags)) {
+          tags.forEach(tag => allTags.add(tag));
+        }
+      });
+      setAvailableTags(Array.from(allTags).sort());
+      
       //for our errors
       console.log('History data loaded:', {
         entries: entries?.length || 0,
         options: Object.keys(options || {}),
+        tags: Array.from(allTags),
       });
     } catch (error) {
       console.error('Error loading history data:', error);
@@ -98,6 +113,14 @@ const History = () => {
       }
     }
 
+    // Story 6: Tag filter
+    if (filters.tag) {
+      filtered = filtered.filter((entry) => {
+        const entryTags = getEntryValue(entry, 'tags') || [];
+        return Array.isArray(entryTags) && entryTags.includes(filters.tag);
+      });
+    }
+
     //to tell the user 
     setFilteredEntries(filtered);
     console.log(
@@ -114,6 +137,7 @@ const History = () => {
     setFilters({
       mood: '',
       dateRange: 'all',
+      tag: '', // Story 6: Clear tag filter
     });
   };
 
@@ -130,6 +154,7 @@ const History = () => {
     const socialInteractions = getEntryValue(entry, 'socialInteractions') || [];
     const gratitude = getEntryValue(entry, 'gratitude') || '';
     const highlight = getEntryValue(entry, 'highlight') || '';
+    const tags = getEntryValue(entry, 'tags') || []; // Story 6: Get tags
 
     //html
     return (
@@ -159,6 +184,26 @@ const History = () => {
               <span className="detail-value">{getEntryValue(entry, 'primaryThoughts')}</span>
             </div>
           </div>
+          {/* Story 6: Display tags */}
+          {Array.isArray(tags) && tags.length > 0 && (
+            <div className="entry-tags" style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="tag-badge"
+                  style={{
+                    background: '#667eea',
+                    color: 'white',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: 12,
+                    fontSize: '0.8rem'
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
           {socialInteractions.length > 0 && (
             <div className="entry-social">
               <strong>Social:</strong> {socialInteractions.join(', ')}
@@ -310,6 +355,25 @@ const History = () => {
             </select>
           </div>
 
+          {/* Story 6: Tag filter */}
+          {availableTags.length > 0 && (
+            <div className="filter-group">
+              <label htmlFor="tag-filter">Tag:</label>
+              <select
+                id="tag-filter"
+                value={filters.tag}
+                onChange={(e) => handleFilterChange('tag', e.target.value)}
+              >
+                <option value="">All Tags</option>
+                {availableTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <button onClick={clearFilters} className="clear-filters">
             Clear Filters
           </button>
@@ -336,6 +400,9 @@ const History = () => {
           )}
         </div>
       </div>
+
+      {/* Story 4: Mood Trend Line Graph */}
+      <TrendGraph entries={moodEntries} />
 
       {/* Color Palette */}
       <div className="palette-section">

@@ -1,0 +1,97 @@
+/* TrendGraph.css - Story 4: Mood Trend Line Graph Styles */
+
+.trend-graph-container {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.trend-graph-container h3 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.trend-graph-wrapper {
+  width: 100%;
+  height: 300px;
+}
+
+.trend-graph-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.trend-graph-empty p {
+  margin: 0.5rem 0;
+}
+
+.trend-tooltip {
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tooltip-color-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-content {
+  font-size: 0.9rem;
+}
+
+.tooltip-content div {
+  margin: 0.3rem 0;
+  color: #333;
+}
+
+.hovered-point-info {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trend-graph-container {
+    padding: 1.5rem;
+  }
+
+  .trend-graph-wrapper {
+    height: 250px;
+  }
+
+  .trend-tooltip {
+    min-width: 150px;
+    padding: 0.8rem;
+  }
+}
+

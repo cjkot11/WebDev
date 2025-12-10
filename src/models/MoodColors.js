@@ -2,7 +2,7 @@ import Parse from 'parse';
 import LocalStorageService from '../services/localStorageService';
 
 /**
- Mood Colors Parse Model
+ Mood Colors Parse Model (Sophia - Feature 6 edited this)
  stores color mappings for different moods
  */
 class MoodColors extends Parse.Object {

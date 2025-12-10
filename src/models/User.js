@@ -139,12 +139,12 @@ class User extends Parse.User {
     return await user.save();
   }
 
-  //authentification - dont know if we want to use 
+  //authentification 
   static isAuthenticated() {
     return Parse.User.current() !== null;
   }
 
-  //get the user's name 
+  //get the user's name  - we didnt end up displaying this in the final feature 6
   static async getDisplayName(userId = null) {
     const user = userId ? await User.getById(userId) : User.getCurrentUser();
     

@@ -1,0 +1,200 @@
+/* Settings.css - Story 5: Settings Component Styles */
+
+.settings-container {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-section h1 {
+  color: #333;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-section p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.settings-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.settings-section h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-description {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.setting-item {
+  margin-bottom: 1.5rem;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.setting-label-text {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.setting-select,
+.setting-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.setting-select:focus,
+.setting-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.setting-hint {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.settings-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.save-settings-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.save-settings-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.save-settings-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #e8f4f8;
+  border-radius: 8px;
+  border-left: 4px solid #17a2b8;
+}
+
+.settings-info p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.error-message,
+.success-message {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.error-message {
+  background: #fee;
+  border: 2px solid #e74c3c;
+}
+
+.success-message {
+  background: #efe;
+  border: 2px solid #28a745;
+}
+
+.error-content,
+.success-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.error-content h3,
+.success-content h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.error-content h3 {
+  color: #e74c3c;
+}
+
+.success-content h3 {
+  color: #28a745;
+}
+
+.error-content button,
+.success-content button {
+  align-self: flex-start;
+  padding: 0.4rem 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 1.5rem;
+  }
+
+  .settings-section {
+    padding: 1rem;
+  }
+}
+

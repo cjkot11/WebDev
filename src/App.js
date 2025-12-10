@@ -6,6 +6,9 @@ import Home from './components/Home';
 import Entry from './components/Entry';
 import History from './components/History';
 import Auth from './components/Auth';
+import Settings from './components/Settings'; // Story 5: Settings
+import WordCloud from './components/WordCloud'; // Story 2: Word Cloud
+import SuggestedActivities from './components/SuggestedActivities'; // Story 3: Suggested Activities
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -76,6 +79,22 @@ function App() {
               Mood History
             </Link>
             <span className="nav-separator">|</span>
+            <Link to="/wordcloud" className="nav-link">
+              Word Cloud
+            </Link>
+            <span className="nav-separator">|</span>
+            <Link to="/activities" className="nav-link">
+              Activities
+            </Link>
+            {currentUser && (
+              <>
+                <span className="nav-separator">|</span>
+                <Link to="/settings" className="nav-link">
+                  Settings
+                </Link>
+              </>
+            )}
+            <span className="nav-separator">|</span>
             {currentUser ? (
               <>
                 <span className="nav-link" style={{ color: '#666' }}>
@@ -116,6 +135,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <History />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/wordcloud" 
+              element={
+                <ProtectedRoute>
+                  <WordCloud />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/activities" 
+              element={
+                <ProtectedRoute>
+                  <SuggestedActivities />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               } 
             />
